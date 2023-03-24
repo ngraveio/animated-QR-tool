@@ -76,6 +76,7 @@ const ScanQRScreen: FC<Props> = () => {
         <View style={{ flex: 1, backgroundColor: "white" }}>
           <KeyboardAvoidingView>
             <TextInput
+              textAlignVertical="top"
               multiline
               value={data}
               onChangeText={setData}
@@ -95,6 +96,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     borderRadius: 10,
     padding: 10,
+    flex: 1,
   },
   scanner: {
     height: "100%",

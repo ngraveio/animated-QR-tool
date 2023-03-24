@@ -43,6 +43,7 @@ const GenerateQRScreen: FC<Props> = () => {
           <SafeAreaView style={{ flex: 1 }}>
             <TextInput
               multiline
+              textAlignVertical="top"
               style={styles.input}
               onChangeText={(text) => {
                 refs.pendingPayload = text;

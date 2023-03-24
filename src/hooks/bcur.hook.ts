@@ -1,5 +1,5 @@
-import { URDecoder } from "@ngraveio/bc-ur";
-import { useRef } from "react";
+import { UR, URDecoder, UREncoder } from "@ngraveio/bc-ur";
+import { useEffect, useReducer, useRef } from "react";
 
 export const useScanAnimatedQr = ({
   onSuccess,
@@ -38,4 +38,82 @@ export const useScanAnimatedQr = ({
   };
 
   return { onBarCodeScan, resetDecoder };
+};
+
+interface IGenerateAnimatedQrState {
+  encoder: UREncoder;
+  frame: string;
+}
+
+const generateAnimatedQrDefaultState: IGenerateAnimatedQrState = {
+  encoder: null,
+  frame: null,
+};
+
+interface IGenerateAnimatedQrConfig {
+  fps?: number;
+  fragmentSize?: number;
+  isActive?: boolean;
+  encoderFactory?: (
+    payload: string,
+    config: Pick<IGenerateAnimatedQrConfig, "fragmentSize">
+  ) => UREncoder;
+}
+
+const defaultEncoderFactory: IGenerateAnimatedQrConfig["encoderFactory"] = (
+  payload,
+  { fragmentSize }
+) => {
+  const ur = UR.fromBuffer(Buffer.from(JSON.stringify(payload)));
+  return new UREncoder(ur, fragmentSize);
+};
+
+/**
+ *
+ * @param payload
+ * @param config.fps
+ * @param config.fragmentSize
+ * @param config.isActive
+ * @param config.encoderFactory is a function that returns an instance of UREncoder. **It should be memoized**
+ * @returns
+ */
+export const useGenerateAnimatedQr = (
+  payload: string,
+  {
+    isActive = true,
+    fps = 8,
+    fragmentSize = 90,
+    encoderFactory = defaultEncoderFactory,
+  }: IGenerateAnimatedQrConfig = {}
+) => {
+  const [state, dispatch] = useReducer(
+    (
+      state: IGenerateAnimatedQrState,
+      newState: Partial<IGenerateAnimatedQrState>
+    ) => ({ ...state, ...newState }),
+    generateAnimatedQrDefaultState
+  );
+
+  useEffect(() => {
+    try {
+      if (payload) {
+        const encoder = encoderFactory(payload, { fragmentSize });
+        dispatch({ encoder, frame: encoder.nextPart().toUpperCase() });
+      } else dispatch(generateAnimatedQrDefaultState);
+    } catch (error) {
+      console.warn("🚀 ~ useEffect ~ error", error);
+    }
+  }, [payload, fragmentSize, encoderFactory]);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (state.encoder)
+      timeout = setTimeout(
+        () => dispatch({ frame: state.encoder.nextPart().toUpperCase() }),
+        1000 / fps
+      );
+    return () => clearTimeout(timeout);
+  }, [state.frame, fps, isActive]);
+
+  return state.frame;
 };
