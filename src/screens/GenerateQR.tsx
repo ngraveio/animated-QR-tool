@@ -23,34 +23,46 @@ const GenerateQRScreen: FC<Props> = () => {
   const [payload, setPayload] = useState<string | null>(null);
   const refs = useRef({ pendingPayload: "" }).current;
   const [fps, setFps] = useState(8);
+  const [fragmentSize, setFragmentSize] = useState(90);
 
   return (
     <>
       <View style={styles.container}>
-        <ScrollView style={styles.scroll}>
-          <View style={styles.qrContainer}>
-            <QRCodeGenerator
-              payload={payload}
-              config={{ fps, fragmentSize: 90, isActive }}
-              size={SCREEN_WIDTH - 40}
-            />
-          </View>
-          <View style={{ gap: 10 }}>
-            <Button
-              title="Enter Payload"
-              onPress={() => setPayloadModalVisible(true)}
-            />
-            <Button title="Reset" onPress={() => setPayload(null)} />
-            <Button
-              title={isActive ? "Pause" : "Resume"}
-              onPress={() => setIsActive((prev) => !prev)}
-            />
-            <View>
-              <Text>FPS</Text>
-              <Counter min={1} max={30} onChange={setFps} value={fps} />
+        <KeyboardAvoidingView keyboardVerticalOffset={100}>
+          <ScrollView style={styles.scroll}>
+            <View style={styles.qrContainer}>
+              <QRCodeGenerator
+                payload={payload}
+                config={{ fps, fragmentSize, isActive }}
+                size={SCREEN_WIDTH - 40}
+              />
             </View>
-          </View>
-        </ScrollView>
+            <View style={{ gap: 10 }}>
+              <Button title="Reset" onPress={() => setPayload(null)} />
+              <Button
+                title="Enter Payload"
+                onPress={() => setPayloadModalVisible(true)}
+              />
+              <Button
+                title={isActive ? "Pause" : "Resume"}
+                onPress={() => setIsActive((prev) => !prev)}
+              />
+              <View>
+                <Text>FPS</Text>
+                <Counter min={1} max={30} onChange={setFps} value={fps} />
+              </View>
+              <View>
+                <Text>FRAGMENT SIZE</Text>
+                <Counter
+                  min={10}
+                  max={2000}
+                  onChange={setFragmentSize}
+                  value={fragmentSize}
+                />
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </View>
       <Modal
         visible={payloadModalVisible}

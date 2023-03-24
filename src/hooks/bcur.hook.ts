@@ -86,9 +86,8 @@ export const useGenerateAnimatedQr = (
     encoderFactory = defaultEncoderFactory,
   }: IGenerateAnimatedQrConfig = {}
 ) => {
-  const refs = useRef<{ timeout: NodeJS.Timeout; isInitialFrame: boolean }>({
+  const refs = useRef<{ timeout: NodeJS.Timeout }>({
     timeout: null,
-    isInitialFrame: true,
   }).current;
   const [state, dispatch] = useReducer(
     (
@@ -110,16 +109,23 @@ export const useGenerateAnimatedQr = (
   }, [payload, fragmentSize, encoderFactory]);
 
   useEffect(() => {
-    if (!isActive) refs.isInitialFrame = true;
+    clearTimeout(refs.timeout);
     if (state.encoder && isActive) {
+      dispatch({ frame: state.encoder.nextPart().toUpperCase() });
+    }
+  }, [state.encoder, isActive, fps]);
+
+  useEffect(() => {
+    if (state.encoder)
       refs.timeout = setTimeout(
         () => dispatch({ frame: state.encoder.nextPart().toUpperCase() }),
-        refs.isInitialFrame ? 0 : 1000 / fps
+        1000 / fps
       );
-      refs.isInitialFrame = false;
-    }
     return () => clearTimeout(refs.timeout);
-  }, [state.frame, fps, isActive]);
+  }, [state.frame]);
 
-  return state.frame;
+  return {
+    currentFrame: state.frame,
+    totalFrames: state.encoder?.fragments.length,
+  };
 };

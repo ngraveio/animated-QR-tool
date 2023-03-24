@@ -4,6 +4,7 @@ import {
   IGenerateAnimatedQrConfig,
   useGenerateAnimatedQr,
 } from "@hooks/bcur.hook";
+import { Text, View } from "react-native";
 
 interface Props extends Omit<QRCodeProps, "value"> {
   payload: string | null;
@@ -11,9 +12,17 @@ interface Props extends Omit<QRCodeProps, "value"> {
 }
 
 const QRCodeGenerator: React.FC<Props> = ({ payload, config, ...props }) => {
-  const frame = useGenerateAnimatedQr(payload, config);
+  const { currentFrame: frame, totalFrames } = useGenerateAnimatedQr(
+    payload,
+    config
+  );
 
-  return <QRCode value={frame ?? "NGRAVE"} {...props} />;
+  return (
+    <View style={{ gap: 10 }}>
+      <QRCode value={frame ?? "NGRAVE"} {...props} />
+      <Text>TOTAL FRAMES: {totalFrames}</Text>
+    </View>
+  );
 };
 
 export default memo(QRCodeGenerator);
