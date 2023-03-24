@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState } from "react";
+import React, { FC, useCallback, useRef, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -7,30 +7,49 @@ import {
   Modal,
   TextInput,
   SafeAreaView,
+  Text,
 } from "react-native";
 import { RootStackScreenProps } from "@navigators/types";
-import QRCodeGenerator from "@components/QRCodeGenerator";
-import { SCREEN_WIDTH } from "../constants";
 import KeyboardAvoidingView from "@components/KeyboardAvoidingView";
+import { SCREEN_WIDTH } from "../constants";
+import QRCodeGenerator from "@components/QRCodeGenerator";
+import Counter from "@components/Counter";
 
 type Props = RootStackScreenProps<"GenerateQR">;
 
 const GenerateQRScreen: FC<Props> = () => {
   const [payloadModalVisible, setPayloadModalVisible] = useState(false);
+  const [isActive, setIsActive] = useState(true);
   const [payload, setPayload] = useState<string | null>(null);
   const refs = useRef({ pendingPayload: "" }).current;
+  const [fps, setFps] = useState(8);
+
   return (
     <>
       <View style={styles.container}>
         <ScrollView style={styles.scroll}>
           <View style={styles.qrContainer}>
-            <QRCodeGenerator value={payload} size={SCREEN_WIDTH - 40} />
+            <QRCodeGenerator
+              payload={payload}
+              config={{ fps, fragmentSize: 90, isActive }}
+              size={SCREEN_WIDTH - 40}
+            />
           </View>
-          <Button
-            title="Enter Payload"
-            onPress={() => setPayloadModalVisible(true)}
-          />
-          <Button title="Reset" onPress={() => setPayload(null)} />
+          <View style={{ gap: 10 }}>
+            <Button
+              title="Enter Payload"
+              onPress={() => setPayloadModalVisible(true)}
+            />
+            <Button title="Reset" onPress={() => setPayload(null)} />
+            <Button
+              title={isActive ? "Pause" : "Resume"}
+              onPress={() => setIsActive((prev) => !prev)}
+            />
+            <View>
+              <Text>FPS</Text>
+              <Counter min={1} max={30} onChange={setFps} value={fps} />
+            </View>
+          </View>
         </ScrollView>
       </View>
       <Modal
@@ -40,7 +59,7 @@ const GenerateQRScreen: FC<Props> = () => {
         onRequestClose={() => setPayloadModalVisible(false)}
       >
         <KeyboardAvoidingView>
-          <SafeAreaView style={{ flex: 1 }}>
+          <SafeAreaView style={styles.modalContainer}>
             <TextInput
               multiline
               textAlignVertical="top"
@@ -64,6 +83,9 @@ const GenerateQRScreen: FC<Props> = () => {
 };
 
 const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+  },
   scroll: {
     flex: 1,
   },

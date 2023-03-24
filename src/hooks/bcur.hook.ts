@@ -50,7 +50,7 @@ const generateAnimatedQrDefaultState: IGenerateAnimatedQrState = {
   frame: null,
 };
 
-interface IGenerateAnimatedQrConfig {
+export interface IGenerateAnimatedQrConfig {
   fps?: number;
   fragmentSize?: number;
   isActive?: boolean;
@@ -69,11 +69,11 @@ const defaultEncoderFactory: IGenerateAnimatedQrConfig["encoderFactory"] = (
 };
 
 /**
- *
- * @param payload
- * @param config.fps
- * @param config.fragmentSize
- * @param config.isActive
+ * Generates an animated QR code
+ * @param payload - the data to be encoded
+ * @param config.fps - the number of frames per second
+ * @param config.fragmentSize - the size of each fragment of the animated QR
+ * @param config.isActive - if false, the animation will be paused, if true, it will resume
  * @param config.encoderFactory is a function that returns an instance of UREncoder. **It should be memoized**
  * @returns
  */
@@ -86,6 +86,10 @@ export const useGenerateAnimatedQr = (
     encoderFactory = defaultEncoderFactory,
   }: IGenerateAnimatedQrConfig = {}
 ) => {
+  const refs = useRef<{ timeout: NodeJS.Timeout; isInitialFrame: boolean }>({
+    timeout: null,
+    isInitialFrame: true,
+  }).current;
   const [state, dispatch] = useReducer(
     (
       state: IGenerateAnimatedQrState,
@@ -106,13 +110,15 @@ export const useGenerateAnimatedQr = (
   }, [payload, fragmentSize, encoderFactory]);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    if (state.encoder)
-      timeout = setTimeout(
+    if (!isActive) refs.isInitialFrame = true;
+    if (state.encoder && isActive) {
+      refs.timeout = setTimeout(
         () => dispatch({ frame: state.encoder.nextPart().toUpperCase() }),
-        1000 / fps
+        refs.isInitialFrame ? 0 : 1000 / fps
       );
-    return () => clearTimeout(timeout);
+      refs.isInitialFrame = false;
+    }
+    return () => clearTimeout(refs.timeout);
   }, [state.frame, fps, isActive]);
 
   return state.frame;

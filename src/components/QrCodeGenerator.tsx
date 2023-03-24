@@ -1,20 +1,17 @@
 import React, { memo } from "react";
 import QRCode, { QRCodeProps } from "react-native-qrcode-svg";
-import { useGenerateAnimatedQr } from "@hooks/bcur.hook";
+import {
+  IGenerateAnimatedQrConfig,
+  useGenerateAnimatedQr,
+} from "@hooks/bcur.hook";
 
 interface Props extends Omit<QRCodeProps, "value"> {
-  value: string | null;
-  fps?: number;
-  fragmentSize?: number;
+  payload: string | null;
+  config: IGenerateAnimatedQrConfig;
 }
 
-const QRCodeGenerator: React.FC<Props> = ({
-  value,
-  fps = 8,
-  fragmentSize = 90,
-  ...props
-}) => {
-  const frame = useGenerateAnimatedQr(value, { fps, fragmentSize });
+const QRCodeGenerator: React.FC<Props> = ({ payload, config, ...props }) => {
+  const frame = useGenerateAnimatedQr(payload, config);
 
   return <QRCode value={frame ?? "NGRAVE"} {...props} />;
 };
