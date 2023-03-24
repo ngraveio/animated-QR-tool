@@ -19,7 +19,7 @@ interface Props extends Omit<QRCodeProps, "value"> {
   encoderFactory?: (value: any) => UREncoder;
 }
 
-const QrCodeGenerator: React.FC<Props> = ({
+const QRCodeGenerator: React.FC<Props> = ({
   value,
   encoderFactory = (value: any, fragmentSize: number) => {
     const ur = UR.fromBuffer(Buffer.from(JSON.stringify(value)));
@@ -61,4 +61,4 @@ const QrCodeGenerator: React.FC<Props> = ({
   return <QRCode value={state.frame ?? "NGRAVE"} {...props} />;
 };
 
-export default memo(QrCodeGenerator);
+export default memo(QRCodeGenerator);

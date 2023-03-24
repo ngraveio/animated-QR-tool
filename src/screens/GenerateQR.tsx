@@ -9,7 +9,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { RootStackScreenProps } from "@navigators/types";
-import QrCodeGenerator from "@components/QrCodeGenerator";
+import QRCodeGenerator from "@components/QRCodeGenerator";
 import { SCREEN_WIDTH } from "../constants";
 import KeyboardAvoidingView from "@components/KeyboardAvoidingView";
 
@@ -24,7 +24,7 @@ const GenerateQRScreen: FC<Props> = () => {
       <View style={styles.container}>
         <ScrollView style={styles.scroll}>
           <View style={styles.qrContainer}>
-            <QrCodeGenerator value={payload} size={SCREEN_WIDTH - 40} />
+            <QRCodeGenerator value={payload} size={SCREEN_WIDTH - 40} />
           </View>
           <Button
             title="Enter Payload"

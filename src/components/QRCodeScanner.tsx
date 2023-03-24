@@ -1,16 +1,16 @@
-import React, { useState, useEffect, FC, memo } from 'react';
-import { Text } from 'react-native';
-import { BarCodeScanner as RNBarCodeScanner, BarCodeScannerProps } from 'expo-barcode-scanner';
+import React, { useState, useEffect, FC, memo } from "react";
+import { Text } from "react-native";
+import { BarCodeScanner, BarCodeScannerProps } from "expo-barcode-scanner";
 
-type Props = Pick<BarCodeScannerProps, "style" | "onBarCodeScanned">
+type Props = Pick<BarCodeScannerProps, "style" | "onBarCodeScanned">;
 
-const BarCodeScanner: FC<Props> = ({style, onBarCodeScanned}) => {
+const QRCodeScanner: FC<Props> = ({ style, onBarCodeScanned }) => {
   const [hasPermission, setHasPermission] = useState(null);
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
-      const { status } = await RNBarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === "granted");
     };
 
     getBarCodeScannerPermissions();
@@ -24,12 +24,12 @@ const BarCodeScanner: FC<Props> = ({style, onBarCodeScanned}) => {
   }
 
   return (
-      <RNBarCodeScanner
-        onBarCodeScanned={onBarCodeScanned}
-        barCodeTypes={[RNBarCodeScanner.Constants.BarCodeType.qr]}
-        style={style}
-      />
+    <BarCodeScanner
+      onBarCodeScanned={onBarCodeScanned}
+      barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
+      style={style}
+    />
   );
-}
+};
 
-export default memo(BarCodeScanner)
+export default memo(QRCodeScanner);
