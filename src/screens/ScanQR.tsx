@@ -15,7 +15,6 @@ type Props = RootStackScreenProps<"ScanQR">;
 
 const ScanQRScreen: FC<Props> = () => {
   const [data, setData] = useState<string>("");
-  const [visible, setVisible] = useState(false);
   const [showProgress, setShowProgress] = useState(false);
   const refs = useRef<{ timeout: NodeJS.Timeout }>({ timeout: null }).current;
   const [option, setOption] = useState<number>(0);
@@ -55,6 +54,7 @@ const ScanQRScreen: FC<Props> = () => {
 
   const reset = () => {
     setIsCompleted(false);
+    resetDecoder();
     return true;
   };
 
@@ -66,19 +66,9 @@ const ScanQRScreen: FC<Props> = () => {
     return () => subscription.remove();
   }, []);
 
-  useEffect(() => {
-    if (!data) {
-      resetDecoder();
-      const timeout = setTimeout(() => {
-        setVisible(false);
-      }, 600);
-      return () => clearTimeout(timeout);
-    } else setVisible(true);
-  }, [data]);
-
   return (
     <View style={styles.container}>
-      {!visible && (
+      {!isCompleted && (
         <QRCodeScanner
           onBarCodeScanned={({ data }) => onBarCodeScan(data)}
           style={styles.scanner}
