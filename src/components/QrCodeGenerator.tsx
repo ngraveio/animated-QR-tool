@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useEffect } from "react";
 import QRCode, { QRCodeProps } from "react-native-qrcode-svg";
 import {
   IGenerateAnimatedQrConfig,
@@ -7,19 +7,30 @@ import {
 import { Text, View } from "react-native";
 
 interface Props extends Omit<QRCodeProps, "value"> {
+  isActive: boolean;
   payload: string | null;
   config: IGenerateAnimatedQrConfig;
 }
 
-const QRCodeGenerator: React.FC<Props> = ({ payload, config, ...props }) => {
-  const { currentFrame: frame, totalFrames } = useGenerateAnimatedQr(
+const QRCodeGenerator: React.FC<Props> = ({
+  payload,
+  config,
+  isActive,
+  ...props
+}) => {
+  const { totalFrames, currentFrame, start, stop } = useGenerateAnimatedQr(
     payload,
     config
   );
 
+  useEffect(() => {
+    if (isActive) start();
+    else stop();
+  }, [isActive]);
+
   return (
     <View style={{ gap: 10 }}>
-      <QRCode value={frame ?? "NGRAVE"} {...props} />
+      <QRCode value={currentFrame || "NGRAVE"} {...props} />
       <Text>TOTAL FRAMES: {totalFrames}</Text>
     </View>
   );

@@ -40,10 +40,8 @@ const ScanQRScreen: FC<Props> = () => {
     try {
       switch (option) {
         case 0:
-          return setData(urDecoder.current.resultUR().cbor.toString());
-        case 1:
           return setData(urDecoder.current.resultUR().decodeCBOR().toString());
-        case 2:
+        case 1:
           return setData(
             JSON.parse(urDecoder.current.resultUR().decodeCBOR().toString())
           );
@@ -97,19 +95,19 @@ const ScanQRScreen: FC<Props> = () => {
           <View>
             <Button
               color={option === 0 && "green"}
-              title="undecoded cbor"
+              title="decoded cbor"
               onPress={() => setOption(0)}
             />
             <Button
               color={option === 1 && "green"}
-              title="decoded cbor"
+              title="json parsed & decoded cbor"
               onPress={() => setOption(1)}
             />
-            <Button
-              color={option === 2 && "green"}
-              title="decoded and json parsed cbor"
-              onPress={() => setOption(2)}
-            />
+            {/* <Button
+              color={option === 1 && "green"}
+              title="extracted & decoded cbor"
+              onPress={() => setOption(1)}
+            /> */}
           </View>
           <Text selectable style={styles.input}>
             {data}

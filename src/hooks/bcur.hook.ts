@@ -1,5 +1,5 @@
 import { UR, URDecoder, UREncoder } from "@ngraveio/bc-ur";
-import { useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export const useScanAnimatedQr = ({
   onSuccess,
@@ -33,20 +33,9 @@ export const useScanAnimatedQr = ({
   return { onBarCodeScan, resetDecoder, urDecoder };
 };
 
-interface IGenerateAnimatedQrState {
-  encoder: UREncoder;
-  frame: string;
-}
-
-const generateAnimatedQrDefaultState: IGenerateAnimatedQrState = {
-  encoder: null,
-  frame: null,
-};
-
 export interface IGenerateAnimatedQrConfig {
   fps?: number;
   fragmentSize?: number;
-  isActive?: boolean;
   encoderFactory?: (
     payload: string,
     config: Pick<IGenerateAnimatedQrConfig, "fragmentSize">
@@ -66,59 +55,68 @@ const defaultEncoderFactory: IGenerateAnimatedQrConfig["encoderFactory"] = (
  * @param payload - the data to be encoded
  * @param config.fps - the number of frames per second
  * @param config.fragmentSize - the size of each fragment of the animated QR
- * @param config.isActive - if false, the animation will be paused, if true, it will resume
  * @param config.encoderFactory is a function that returns an instance of UREncoder. **It should be memoized**
  * @returns
  */
 export const useGenerateAnimatedQr = (
   payload: string,
   {
-    isActive = true,
     fps = 8,
     fragmentSize = 90,
     encoderFactory = defaultEncoderFactory,
   }: IGenerateAnimatedQrConfig = {}
 ) => {
-  const refs = useRef<{ timeout: NodeJS.Timeout }>({
-    timeout: null,
-  }).current;
-  const [state, dispatch] = useReducer(
-    (
-      state: IGenerateAnimatedQrState,
-      newState: Partial<IGenerateAnimatedQrState>
-    ) => ({ ...state, ...newState }),
-    generateAnimatedQrDefaultState
-  );
+  const timeout = useRef<NodeJS.Timeout>(null);
+  const encoder = useRef<UREncoder>(null);
+  const [frame, setFrame] = useState<string>(null);
+
+  const hasEncoder = useCallback(() => !!encoder.current, []);
+
+  const getNextFrame = useCallback(() => {
+    if (!hasEncoder()) return null;
+    return encoder.current.nextPart().toUpperCase();
+  }, []);
 
   useEffect(() => {
+    stop();
     try {
-      if (payload) {
-        const encoder = encoderFactory(payload, { fragmentSize });
-        dispatch({ encoder, frame: encoder.nextPart().toUpperCase() });
-      } else dispatch(generateAnimatedQrDefaultState);
+      if (payload && fragmentSize && encoderFactory) {
+        encoder.current = encoderFactory(payload, { fragmentSize });
+        start();
+      } else {
+        encoder.current = null;
+        setFrame(null);
+      }
     } catch (error) {
       console.warn("🚀 ~ useEffect ~ error", error);
     }
   }, [payload, fragmentSize, encoderFactory]);
 
-  useEffect(() => {
-    clearTimeout(refs.timeout);
-    if (state.encoder && isActive) {
-      dispatch({ frame: state.encoder.nextPart().toUpperCase() });
-    }
-  }, [state.encoder, isActive, fps]);
+  const start = useCallback(() => {
+    setFrame(getNextFrame());
+  }, []);
+
+  const stop = useCallback(() => {
+    if (!timeout.current) return;
+    clearInterval(timeout.current);
+    timeout.current = null;
+  }, []);
 
   useEffect(() => {
-    if (state.encoder)
-      refs.timeout = setTimeout(
-        () => dispatch({ frame: state.encoder.nextPart().toUpperCase() }),
-        1000 / fps
-      );
-    return () => clearTimeout(refs.timeout);
-  }, [state.frame]);
+    if (hasEncoder())
+      timeout.current = setTimeout(() => setFrame(getNextFrame()), 1000 / fps);
+    return () => stop();
+  }, [frame]);
+
+  useEffect(() => {
+    stop();
+    start();
+  }, [fps]);
 
   return {
-    currentFrame: state.frame,
-    totalFrames: state.encoder?.fragments.length,
+    currentFrame: frame,
+    totalFrames: encoder.current?.fragments.length,
+    start,
+    stop,
   };
 };

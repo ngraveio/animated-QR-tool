@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -24,6 +24,11 @@ const GenerateQRScreen: FC<Props> = () => {
   const refs = useRef({ pendingPayload: "" }).current;
   const [fps, setFps] = useState(8);
   const [fragmentSize, setFragmentSize] = useState(90);
+  const [isStarted, setIsStarted] = useState(false);
+
+  useEffect(() => {
+    setPayload(isStarted ? refs.pendingPayload : null);
+  }, [isStarted]);
 
   return (
     <>
@@ -33,19 +38,22 @@ const GenerateQRScreen: FC<Props> = () => {
             <View style={styles.qrContainer}>
               <QRCodeGenerator
                 payload={payload}
-                config={{ fps, fragmentSize, isActive }}
+                isActive={isActive && isStarted}
+                config={{ fps, fragmentSize }}
                 size={SCREEN_WIDTH - 40}
               />
             </View>
             <View style={{ gap: 10 }}>
-              <Button title="Reset" onPress={() => setPayload(null)} />
+              <Button title={"Reset"} onPress={() => setIsStarted(false)} />
               <Button
                 title="Enter Payload"
                 onPress={() => setPayloadModalVisible(true)}
               />
               <Button
-                title={isActive ? "Pause" : "Resume"}
-                onPress={() => setIsActive((prev) => !prev)}
+                title={isStarted ? (isActive ? "Pause" : "Resume") : "Start"}
+                onPress={() => {
+                  isStarted ? setIsActive((prev) => !prev) : setIsStarted(true);
+                }}
               />
               <View>
                 <Text>FPS</Text>
