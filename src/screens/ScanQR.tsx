@@ -37,17 +37,21 @@ const ScanQRScreen: FC<Props> = () => {
 
   useEffect(() => {
     if (!isCompleted) return setData("");
-    switch (option) {
-      case 0:
-        return setData(urDecoder.current.resultUR().cbor.toString());
-      case 1:
-        return setData(urDecoder.current.resultUR().decodeCBOR().toString());
-      case 2:
-        return setData(
-          JSON.parse(urDecoder.current.resultUR().decodeCBOR().toString())
-        );
-      default:
-        return setData("");
+    try {
+      switch (option) {
+        case 0:
+          return setData(urDecoder.current.resultUR().cbor.toString());
+        case 1:
+          return setData(urDecoder.current.resultUR().decodeCBOR().toString());
+        case 2:
+          return setData(
+            JSON.parse(urDecoder.current.resultUR().decodeCBOR().toString())
+          );
+        default:
+          return setData("");
+      }
+    } catch (error) {
+      alert(error);
     }
   }, [option, isCompleted]);
 
