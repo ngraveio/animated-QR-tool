@@ -7,7 +7,7 @@ export const useScanAnimatedQr = ({
   onProgress,
   onScan,
 }: {
-  onSuccess?: (data: string) => void;
+  onSuccess?: (data: Buffer) => void;
   onFail?: (error: string) => void;
   onProgress?: (progress: number) => void;
   onScan?: (data: string) => void;
@@ -25,8 +25,7 @@ export const useScanAnimatedQr = ({
 
       if (urDecoder.current.isComplete()) {
         const parsed = urDecoder.current.resultUR().decodeCBOR();
-        onSuccess?.(JSON.parse(parsed.toString()));
-        urDecoder.current = new URDecoder();
+        onSuccess?.(parsed);
       }
 
       onProgress?.(urDecoder.current.getProgress());
@@ -37,7 +36,7 @@ export const useScanAnimatedQr = ({
     }
   };
 
-  return { onBarCodeScan, resetDecoder };
+  return { onBarCodeScan, resetDecoder, urDecoder };
 };
 
 interface IGenerateAnimatedQrState {

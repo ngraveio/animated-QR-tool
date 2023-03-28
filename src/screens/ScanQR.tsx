@@ -3,13 +3,11 @@ import {
   View,
   StyleSheet,
   Modal,
-  TextInput,
   BackHandler,
-  Platform,
   Text,
+  Button,
 } from "react-native";
 import QRCodeScanner from "@components/QRCodeScanner";
-import KeyboardAvoidingView from "@components/KeyboardAvoidingView";
 import { useScanAnimatedQr } from "../hooks/bcur.hook";
 import { RootStackScreenProps } from "../navigators/types";
 
@@ -20,10 +18,12 @@ const ScanQRScreen: FC<Props> = () => {
   const [visible, setVisible] = useState(false);
   const [showProgress, setShowProgress] = useState(false);
   const refs = useRef<{ timeout: NodeJS.Timeout }>({ timeout: null }).current;
+  const [option, setOption] = useState<number>(0);
+  const [isCompleted, setIsCompleted] = useState(false);
 
-  const { onBarCodeScan, resetDecoder } = useScanAnimatedQr({
-    onSuccess: (data) => {
-      setData(data);
+  const { onBarCodeScan, resetDecoder, urDecoder } = useScanAnimatedQr({
+    onSuccess: () => {
+      setIsCompleted(true);
     },
     onFail: (error) => {
       setData("ERROR: " + error);
@@ -35,8 +35,24 @@ const ScanQRScreen: FC<Props> = () => {
     },
   });
 
+  useEffect(() => {
+    if (!isCompleted) return setData("");
+    switch (option) {
+      case 0:
+        return setData(urDecoder.current.resultUR().cbor.toString());
+      case 1:
+        return setData(urDecoder.current.resultUR().decodeCBOR().toString());
+      case 2:
+        return setData(
+          JSON.parse(urDecoder.current.resultUR().decodeCBOR().toString())
+        );
+      default:
+        return setData("");
+    }
+  }, [option, isCompleted]);
+
   const reset = () => {
-    setData("");
+    setIsCompleted(false);
     return true;
   };
 
@@ -68,21 +84,32 @@ const ScanQRScreen: FC<Props> = () => {
       )}
       {showProgress && <Text style={styles.progress}>Scanning...</Text>}
       <Modal
-        visible={!!data}
+        visible={isCompleted}
         animationType="slide"
         presentationStyle="formSheet"
         onRequestClose={reset}
       >
         <View style={{ flex: 1, backgroundColor: "white" }}>
-          <KeyboardAvoidingView>
-            <TextInput
-              textAlignVertical="top"
-              multiline
-              value={data}
-              onChangeText={setData}
-              style={styles.input}
+          <View>
+            <Button
+              color={option === 0 && "green"}
+              title="undecoded cbor"
+              onPress={() => setOption(0)}
             />
-          </KeyboardAvoidingView>
+            <Button
+              color={option === 1 && "green"}
+              title="decoded cbor"
+              onPress={() => setOption(1)}
+            />
+            <Button
+              color={option === 2 && "green"}
+              title="decoded and json parsed cbor"
+              onPress={() => setOption(2)}
+            />
+          </View>
+          <Text selectable style={styles.input}>
+            {data}
+          </Text>
         </View>
       </Modal>
     </View>
