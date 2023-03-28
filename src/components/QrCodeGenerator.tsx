@@ -9,7 +9,7 @@ import { Text, View } from "react-native";
 interface Props extends Omit<QRCodeProps, "value"> {
   isActive: boolean;
   payload: string | null;
-  config: IGenerateAnimatedQrConfig;
+  config: Omit<IGenerateAnimatedQrConfig, "autoStart">;
 }
 
 const QRCodeGenerator: React.FC<Props> = ({

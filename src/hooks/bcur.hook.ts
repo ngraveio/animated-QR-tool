@@ -36,6 +36,7 @@ export const useScanAnimatedQr = ({
 export interface IGenerateAnimatedQrConfig {
   fps?: number;
   fragmentSize?: number;
+  autoStart?: boolean;
   encoderFactory?: (
     payload: string,
     config: Pick<IGenerateAnimatedQrConfig, "fragmentSize">
@@ -55,6 +56,7 @@ const defaultEncoderFactory: IGenerateAnimatedQrConfig["encoderFactory"] = (
  * @param payload - the data to be encoded
  * @param config.fps - the number of frames per second
  * @param config.fragmentSize - the size of each fragment of the animated QR
+ * @param config.autoStart - whether to start the animation automatically
  * @param config.encoderFactory is a function that returns an instance of UREncoder. **It should be memoized**
  * @returns
  */
@@ -63,6 +65,7 @@ export const useGenerateAnimatedQr = (
   {
     fps = 8,
     fragmentSize = 90,
+    autoStart = false,
     encoderFactory = defaultEncoderFactory,
   }: IGenerateAnimatedQrConfig = {}
 ) => {
@@ -82,7 +85,7 @@ export const useGenerateAnimatedQr = (
     try {
       if (payload && fragmentSize && encoderFactory) {
         encoder.current = encoderFactory(payload, { fragmentSize });
-        start();
+        autoStart && start();
       } else {
         encoder.current = null;
         setFrame(null);

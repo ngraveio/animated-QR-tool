@@ -6,10 +6,12 @@ import {
   BackHandler,
   Text,
   Button,
+  ScrollView,
 } from "react-native";
 import QRCodeScanner from "@components/QRCodeScanner";
 import { useScanAnimatedQr } from "../hooks/bcur.hook";
 import { RootStackScreenProps } from "../navigators/types";
+import pako from "pako";
 
 type Props = RootStackScreenProps<"ScanQR">;
 
@@ -37,16 +39,17 @@ const ScanQRScreen: FC<Props> = () => {
   useEffect(() => {
     if (!isCompleted) return setData("");
     try {
+      let result = urDecoder.current.resultUR().decodeCBOR().toString() as any;
+      while (typeof result === "string") result = JSON.parse(result);
       switch (option) {
-        case 0:
-          return setData(urDecoder.current.resultUR().decodeCBOR().toString());
-        case 1:
-          return setData(
-            JSON.parse(urDecoder.current.resultUR().decodeCBOR().toString())
-          );
-        default:
-          return setData("");
+        case 1: {
+          const buffer = Buffer.from(result.data, "base64");
+          result = pako.ungzip(buffer, { to: "string" }) as string;
+          result = JSON.parse(result);
+          return setData(JSON.stringify(result, null, 2));
+        }
       }
+      return setData(JSON.stringify(result, null, 2));
     } catch (error) {
       alert(error);
     }
@@ -90,18 +93,15 @@ const ScanQRScreen: FC<Props> = () => {
             />
             <Button
               color={option === 1 && "green"}
-              title="json parsed & decoded cbor"
+              title="decoded cbor & unzipped"
               onPress={() => setOption(1)}
             />
-            {/* <Button
-              color={option === 1 && "green"}
-              title="extracted & decoded cbor"
-              onPress={() => setOption(1)}
-            /> */}
           </View>
-          <Text selectable style={styles.input}>
-            {data}
-          </Text>
+          <ScrollView bounces={false}>
+            <Text selectable style={styles.input}>
+              {data}
+            </Text>
+          </ScrollView>
         </View>
       </Modal>
     </View>
