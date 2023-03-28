@@ -4,12 +4,10 @@ import { useEffect, useReducer, useRef } from "react";
 export const useScanAnimatedQr = ({
   onSuccess,
   onFail,
-  onProgress,
   onScan,
 }: {
-  onSuccess?: (data: Buffer) => void;
+  onSuccess?: (data: string) => void;
   onFail?: (error: string) => void;
-  onProgress?: (progress: number) => void;
   onScan?: (data: string) => void;
 } = {}) => {
   const urDecoder = useRef(new URDecoder());
@@ -23,12 +21,8 @@ export const useScanAnimatedQr = ({
     try {
       urDecoder.current.receivePart(data);
 
-      if (urDecoder.current.isComplete()) {
-        const parsed = urDecoder.current.resultUR().decodeCBOR();
-        onSuccess?.(parsed);
-      }
+      if (urDecoder.current.isComplete()) onSuccess?.(data);
 
-      onProgress?.(urDecoder.current.getProgress());
       onScan?.(data);
     } catch (error) {
       onFail?.(error);
