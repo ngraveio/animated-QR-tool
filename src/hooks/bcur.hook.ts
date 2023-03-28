@@ -57,7 +57,7 @@ const defaultEncoderFactory: IGenerateAnimatedQrConfig["encoderFactory"] = (
   payload,
   { fragmentSize }
 ) => {
-  const ur = UR.fromBuffer(Buffer.from(JSON.stringify(payload)));
+  const ur = UR.fromBuffer(Buffer.from(payload));
   return new UREncoder(ur, fragmentSize);
 };
 

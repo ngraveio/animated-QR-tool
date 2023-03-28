@@ -54,7 +54,7 @@ const GenerateQRScreen: FC<Props> = () => {
               <View>
                 <Text>FRAGMENT SIZE</Text>
                 <Counter
-                  min={10}
+                  min={1}
                   max={2000}
                   onChange={setFragmentSize}
                   value={fragmentSize}
