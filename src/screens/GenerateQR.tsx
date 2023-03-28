@@ -52,12 +52,14 @@ const GenerateQRScreen: FC<Props> = () => {
               <Button
                 title={isStarted ? (isActive ? "Pause" : "Resume") : "Start"}
                 onPress={() => {
-                  isStarted ? setIsActive((prev) => !prev) : setIsStarted(true);
+                  isStarted
+                    ? setIsActive((prev) => !prev)
+                    : setIsStarted(!!refs.pendingPayload);
                 }}
               />
               <View>
                 <Text>FPS</Text>
-                <Counter min={1} max={30} onChange={setFps} value={fps} />
+                <Counter min={1} max={60} onChange={setFps} value={fps} />
               </View>
               <View>
                 <Text>FRAGMENT SIZE</Text>
