@@ -40,10 +40,12 @@ const ScanQRScreen: FC<Props> = () => {
     if (!isCompleted) return setData("");
     try {
       let result = urDecoder.current.resultUR().decodeCBOR().toString() as any;
-      while (typeof result === "string") result = JSON.parse(result);
+      try {
+        while (typeof result === "string") result = JSON.parse(result);
+      } catch {}
       switch (option) {
         case 1: {
-          const buffer = Buffer.from(result.data, "base64");
+          const buffer = Buffer.from(result.data || "KABUK", "base64");
           result = pako.ungzip(buffer, { to: "string" }) as string;
           result = JSON.parse(result);
           return setData(JSON.stringify(result, null, 2));
