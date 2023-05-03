@@ -1,0 +1,39 @@
+image: node:latest
+
+stages:
+  - build
+  - deploy
+
+cache:
+  paths:
+    - node_modules/
+
+install_dependencies:
+  stage: build
+  script:
+    - yarn install
+  artifacts:
+    paths:
+      - node_modules/
+
+expo_export:
+  stage: build
+  script:
+    - yarn add --dev metro-core
+    - npx expo export --platform web
+  artifacts:
+    paths:
+      - dist/
+
+pages:
+  stage: deploy
+  dependencies:
+    - expo_export
+  script:
+    - mv dist public
+  artifacts:
+    paths:
+      - public/
+    expire_in: 1 day
+  only:
+    - main
