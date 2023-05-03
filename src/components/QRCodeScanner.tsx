@@ -1,32 +1,30 @@
 import React, { useState, useEffect, FC, memo } from "react";
 import { Text } from "react-native";
 import { BarCodeScanner, BarCodeScannerProps } from "expo-barcode-scanner";
+import { Camera } from "expo-camera";
 
 type Props = Pick<BarCodeScannerProps, "style" | "onBarCodeScanned">;
 
 const QRCodeScanner: FC<Props> = ({ style, onBarCodeScanned }) => {
-  const [hasPermission, setHasPermission] = useState(null);
+  const [permission, requestPermission] = Camera.useCameraPermissions();
 
   useEffect(() => {
-    const getBarCodeScannerPermissions = async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === "granted");
-    };
-
-    getBarCodeScannerPermissions();
+    requestPermission();
   }, []);
 
-  if (hasPermission === null) {
+  if (!permission) {
     return <Text>Requesting for camera permission</Text>;
   }
-  if (hasPermission === false) {
+  if (!permission.granted) {
     return <Text>No access to camera</Text>;
   }
 
   return (
-    <BarCodeScanner
+    <Camera
       onBarCodeScanned={onBarCodeScanned}
-      barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
+      barCodeScannerSettings={{
+        barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr],
+      }}
       style={style}
     />
   );
