@@ -67,7 +67,8 @@ export const useGenerateAnimatedQr = (
     fragmentSize = 90,
     autoStart = false,
     encoderFactory = defaultEncoderFactory,
-  }: IGenerateAnimatedQrConfig = {}
+  }: IGenerateAnimatedQrConfig = {},
+  isActive: boolean
 ) => {
   const timeout = useRef<NodeJS.Timeout>(null);
   const encoder = useRef<UREncoder>(null);
@@ -93,7 +94,7 @@ export const useGenerateAnimatedQr = (
     } catch (error) {
       console.warn("🚀 ~ useEffect ~ error", error);
     }
-  }, [payload, fragmentSize, encoderFactory]);
+  }, [isActive, payload, fragmentSize, encoderFactory]);
 
   const start = useCallback(() => {
     setFrame(getNextFrame());

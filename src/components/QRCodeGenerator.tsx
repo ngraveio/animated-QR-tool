@@ -20,7 +20,8 @@ const QRCodeGenerator: React.FC<Props> = ({
 }) => {
   const { totalFrames, currentFrame, start, stop } = useGenerateAnimatedQr(
     payload,
-    config
+    config,
+    isActive
   );
 
   useEffect(() => {
