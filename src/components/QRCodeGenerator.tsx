@@ -5,10 +5,11 @@ import {
   useGenerateAnimatedQr,
 } from "@hooks/bcur.hook";
 import { Text, View } from "react-native";
+import { Ur } from "./../../bcur";
 
 interface Props extends Omit<QRCodeProps, "value"> {
   isActive: boolean;
-  payload: string | null;
+  payload: Ur<any> | null;
   config: Omit<IGenerateAnimatedQrConfig, "autoStart">;
 }
 
@@ -20,7 +21,8 @@ const QRCodeGenerator: React.FC<Props> = ({
 }) => {
   const { totalFrames, currentFrame, start, stop } = useGenerateAnimatedQr(
     payload,
-    config
+    config, 
+    isActive
   );
 
   useEffect(() => {

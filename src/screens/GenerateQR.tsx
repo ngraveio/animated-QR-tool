@@ -8,27 +8,31 @@ import {
   TextInput,
   SafeAreaView,
   Text,
+  Platform,
 } from "react-native";
 import { RootStackScreenProps } from "@navigators/types";
 import KeyboardAvoidingView from "@components/KeyboardAvoidingView";
 import { SCREEN_WIDTH } from "../constants";
 import QRCodeGenerator from "@components/QRCodeGenerator";
 import Counter from "@components/Counter";
+import { Ur } from "./../../bcur";
 
 type Props = RootStackScreenProps<"GenerateQR">;
 
 const GenerateQRScreen: FC<Props> = () => {
   const [payloadModalVisible, setPayloadModalVisible] = useState(false);
-  const [isActive, setIsActive] = useState(true);
-  const [payload, setPayload] = useState<string | null>(null);
+  const [isActive, setIsActive] = useState(false);
+  const [payload, setPayload] = useState<Ur<any> | null>(null);
   const refs = useRef({ pendingPayload: "" }).current;
   const [fps, setFps] = useState(8);
   const [fragmentSize, setFragmentSize] = useState(90);
-  const [isStarted, setIsStarted] = useState(false);
 
+  // set intial payload
   useEffect(() => {
-    setPayload(isStarted ? refs.pendingPayload : null);
-  }, [isStarted]);
+    const hardCodedPayload = "Pieter";
+    const ur = Ur.toUr(hardCodedPayload, { type: "bytes" });
+    setPayload(payload ?? ur);
+  }, []);
 
   return (
     <>
@@ -38,24 +42,20 @@ const GenerateQRScreen: FC<Props> = () => {
             <View style={styles.qrContainer}>
               <QRCodeGenerator
                 payload={payload}
-                isActive={isActive && isStarted}
+                isActive={isActive}
                 config={{ fps, fragmentSize }}
-                size={SCREEN_WIDTH - 40}
+                size={Platform.OS === "web" ? 600 : SCREEN_WIDTH - 40}
               />
             </View>
             <View style={{ gap: 10 }}>
-              <Button title={"Reset"} onPress={() => setIsStarted(false)} />
+              <Button title={"Reset"} onPress={() => {setPayload(null); setIsActive(false)}} />
               <Button
                 title="Enter Payload"
                 onPress={() => setPayloadModalVisible(true)}
               />
               <Button
-                title={isStarted ? (isActive ? "Pause" : "Resume") : "Start"}
-                onPress={() => {
-                  isStarted
-                    ? setIsActive((prev) => !prev)
-                    : setIsStarted(!!refs.pendingPayload);
-                }}
+                title={isActive ? "Stop" : "Start"}
+                onPress={() => {setIsActive((prev) => !prev)}}
               />
               <View>
                 <Text>FPS</Text>
@@ -93,7 +93,7 @@ const GenerateQRScreen: FC<Props> = () => {
             <Button
               title="Enter"
               onPress={() => {
-                setPayload(refs.pendingPayload);
+                setPayload(Ur.toUr(refs.pendingPayload, {type: "bytes"}));
                 setPayloadModalVisible(false);
               }}
             />

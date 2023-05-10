@@ -1,6 +1,15 @@
-import { UR, URDecoder, UREncoder } from "@ngraveio/bc-ur";
+// import { UR, URDecoder, UREncoder } from "@ngraveio/bc-ur";
+import {
+  NgraveTranscoder,
+  Ur,
+  UrFountainEncoder,
+} from "./../../bcur";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+const {
+  fountainEncoderCreator,
+  fountainDecoderCreator,
+} = new NgraveTranscoder();
 export const useScanAnimatedQr = ({
   onSuccess,
   onFail,
@@ -10,10 +19,10 @@ export const useScanAnimatedQr = ({
   onFail?: (error: string) => void;
   onScan?: (data: string) => void;
 } = {}) => {
-  const urDecoder = useRef(new URDecoder());
+  const urDecoder = useRef(fountainDecoderCreator());
 
   const resetDecoder = () => {
-    urDecoder.current = new URDecoder();
+    urDecoder.current = fountainDecoderCreator();
   };
 
   const onBarCodeScan = (data: string) => {
@@ -38,17 +47,16 @@ export interface IGenerateAnimatedQrConfig {
   fragmentSize?: number;
   autoStart?: boolean;
   encoderFactory?: (
-    payload: string,
+    payload: Ur<any>,
     config: Pick<IGenerateAnimatedQrConfig, "fragmentSize">
-  ) => UREncoder;
+  ) => UrFountainEncoder<any>;
 }
 
 const defaultEncoderFactory: IGenerateAnimatedQrConfig["encoderFactory"] = (
   payload,
   { fragmentSize }
 ) => {
-  const ur = UR.fromBuffer(Buffer.from(payload));
-  return new UREncoder(ur, fragmentSize);
+  return fountainEncoderCreator(payload, fragmentSize);
 };
 
 /**
@@ -61,24 +69,26 @@ const defaultEncoderFactory: IGenerateAnimatedQrConfig["encoderFactory"] = (
  * @returns
  */
 export const useGenerateAnimatedQr = (
-  payload: string,
+  payload: Ur<any>,
   {
     fps = 8,
     fragmentSize = 90,
     autoStart = false,
     encoderFactory = defaultEncoderFactory,
-  }: IGenerateAnimatedQrConfig = {}
+  }: IGenerateAnimatedQrConfig = {}, isActive
 ) => {
   const timeout = useRef<NodeJS.Timeout>(null);
-  const encoder = useRef<UREncoder>(null);
+  const encoder = useRef<UrFountainEncoder<any>>(null);
   const [frame, setFrame] = useState<string>(null);
 
   const hasEncoder = useCallback(() => !!encoder.current, []);
 
   const getNextFrame = useCallback(() => {
-    if (!hasEncoder()) return null;
+    if (!hasEncoder()) {
+      return null;
+    }
     return encoder.current.nextPart().toUpperCase();
-  }, []);
+  }, [payload]);
 
   useEffect(() => {
     stop();
@@ -93,7 +103,7 @@ export const useGenerateAnimatedQr = (
     } catch (error) {
       console.warn("🚀 ~ useEffect ~ error", error);
     }
-  }, [payload, fragmentSize, encoderFactory]);
+  }, [isActive, payload, fragmentSize, encoderFactory]);
 
   const start = useCallback(() => {
     setFrame(getNextFrame());
@@ -118,7 +128,7 @@ export const useGenerateAnimatedQr = (
 
   return {
     currentFrame: frame,
-    totalFrames: encoder.current?.fragments.length,
+    totalFrames: encoder.current?.getPureFragmentCount(),
     start,
     stop,
   };

@@ -39,13 +39,15 @@ const ScanQRScreen: FC<Props> = () => {
   useEffect(() => {
     if (!isCompleted) return setData("");
     try {
-      let result = urDecoder.current.resultUR().decodeCBOR().toString() as any;
+      let result = urDecoder.current.getDecodedResult();
+      console.log('ur', urDecoder.current.getUrResult())
+      console.log('decoded', result)
       try {
         while (typeof result === "string") result = JSON.parse(result);
       } catch {}
       switch (option) {
         case 1: {
-          const buffer = Buffer.from(result.data || "KABUK", "base64");
+          const buffer = Buffer.from(result.payload || "KABUK", "base64");
           result = pako.ungzip(buffer, { to: "string" }) as string;
           result = JSON.parse(result);
           return setData(JSON.stringify(result, null, 2));
