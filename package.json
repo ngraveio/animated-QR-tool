@@ -11,6 +11,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@expo/webpack-config": "^18.0.1",
     "@keystonehq/bc-ur-registry": "^0.5.5",
     "@keystonehq/ur-decoder": "^0.11.0",
     "@ngraveio/bc-ur": "1.1.3",
