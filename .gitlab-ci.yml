@@ -19,18 +19,19 @@ install_dependencies:
 expo_export:
   stage: build
   script:
-    - yarn add --dev metro-core
-    - npx expo export --platform web
+    - yarn add --dev @expo/webpack-config
+    - npx expo export:web
+
   artifacts:
     paths:
-      - dist/
+      - web-build/
 
 pages:
   stage: deploy
   dependencies:
     - expo_export
   script:
-    - mv dist public
+    - mv web-build public
   artifacts:
     paths:
       - public/
