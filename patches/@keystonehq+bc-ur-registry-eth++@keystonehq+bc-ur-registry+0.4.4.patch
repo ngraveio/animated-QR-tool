@@ -1,0 +1,23 @@
+diff --git a/node_modules/@keystonehq/bc-ur-registry-eth/node_modules/@keystonehq/bc-ur-registry/dist/CryptoAccount.js b/node_modules/@keystonehq/bc-ur-registry-eth/node_modules/@keystonehq/bc-ur-registry/dist/CryptoAccount.js
+index 81e28db..88b8585 100644
+--- a/node_modules/@keystonehq/bc-ur-registry-eth/node_modules/@keystonehq/bc-ur-registry/dist/CryptoAccount.js
++++ b/node_modules/@keystonehq/bc-ur-registry-eth/node_modules/@keystonehq/bc-ur-registry/dist/CryptoAccount.js
+@@ -1,7 +1,7 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.CryptoAccount = void 0;
+-const _1 = require(".");
++const _1 = require("./CryptoOutput");
+ const lib_1 = require("./lib");
+ const RegistryItem_1 = require("./RegistryItem");
+ const RegistryType_1 = require("./RegistryType");
+diff --git a/node_modules/@keystonehq/bc-ur-registry-eth/node_modules/@keystonehq/bc-ur-registry/src/CryptoAccount.ts b/node_modules/@keystonehq/bc-ur-registry-eth/node_modules/@keystonehq/bc-ur-registry/src/CryptoAccount.ts
+index 753e535..4e66ba2 100644
+--- a/node_modules/@keystonehq/bc-ur-registry-eth/node_modules/@keystonehq/bc-ur-registry/src/CryptoAccount.ts
++++ b/node_modules/@keystonehq/bc-ur-registry-eth/node_modules/@keystonehq/bc-ur-registry/src/CryptoAccount.ts
+@@ -1,4 +1,4 @@
+-import { CryptoOutput } from '.';
++import { CryptoOutput } from './CryptoOutput';
+ import { decodeToDataItem, DataItem } from './lib';
+ import { RegistryItem } from './RegistryItem';
+ import { RegistryTypes } from './RegistryType';

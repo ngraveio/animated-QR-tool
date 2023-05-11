@@ -30,8 +30,9 @@ const QRCodeGenerator: React.FC<Props> = ({
   }, [isActive]);
 
   return (
-    <View style={{ gap: 10 }}>
+    <View style={{ gap: 10, justifyContent:"center", alignItems:"center" }}>
       <QRCode value={currentFrame || "NGRAVE"} {...props} />
+      <Text>{currentFrame}</Text>
       <Text>TOTAL FRAMES: {totalFrames}</Text>
     </View>
   );

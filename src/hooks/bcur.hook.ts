@@ -1,5 +1,6 @@
 import { UR, URDecoder, UREncoder } from "@ngraveio/bc-ur";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { URRegistryDecoder } from '@keystonehq/ur-decoder';
 
 export const useScanAnimatedQr = ({
   onSuccess,
@@ -10,10 +11,11 @@ export const useScanAnimatedQr = ({
   onFail?: (error: string) => void;
   onScan?: (data: string) => void;
 } = {}) => {
-  const urDecoder = useRef(new URDecoder());
+  // const urDecoder = useRef(new URDecoder());
+  const urDecoder = useRef(new URRegistryDecoder());
 
   const resetDecoder = () => {
-    urDecoder.current = new URDecoder();
+    urDecoder.current = new URRegistryDecoder();
   };
 
   const onBarCodeScan = (data: string) => {
