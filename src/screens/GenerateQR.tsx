@@ -73,31 +73,6 @@ export function createCryptoHdKey(): RegistryItem {
   return hdkey;
 }
 
-export function createCryptoMultiAccount(): RegistryItem {
-  const originKeyPath = new CryptoKeypath([
-    new PathComponent({ index: 44, hardened: true }),
-    new PathComponent({ index: 501, hardened: true }),
-    new PathComponent({ index: 0, hardened: true }),
-    new PathComponent({ index: 0, hardened: true }),
-  ]);
-
-  const cryptoHDKey = new CryptoHDKey({
-    isMaster: false,
-    key: Buffer.from(
-      "02eae4b876a8696134b868f88cc2f51f715f2dbedb7446b8e6edf3d4541c4eb67b",
-      "hex"
-    ),
-    origin: originKeyPath,
-  });
-
-  const multiAccounts = new CryptoMultiAccounts(
-    Buffer.from("e9181cf3", "hex"),
-    [cryptoHDKey],
-    "keystone"
-  );
-  return multiAccounts;
-}
-
 export function createCryptoAccount(): RegistryItem {
   const masterFingerprint = Buffer.from("37b5eed4", "hex");
   const parentFingerprint = Buffer.from("37b5eed4", "hex");
@@ -132,10 +107,37 @@ export function createCryptoAccount(): RegistryItem {
   ]);
   return cryptoAccount;
 }
+export function createCryptoMultiAccount(): RegistryItem {
+  const originKeyPath = new CryptoKeypath([
+    new PathComponent({ index: 44, hardened: true }),
+    new PathComponent({ index: 501, hardened: true }),
+    new PathComponent({ index: 0, hardened: true }),
+    new PathComponent({ index: 0, hardened: true }),
+  ]);
+  
+  const cryptoHDKey = new CryptoHDKey({
+    isMaster: false,
+    key: Buffer.from(
+      "02eae4b876a8696134b868f88cc2f51f715f2dbedb7446b8e6edf3d4541c4eb67b",
+      "hex"
+    ),
+    origin: originKeyPath,
+  });
+  
+  const multiAccounts = new CryptoMultiAccounts(
+    Buffer.from("e9181cf3", "hex"),
+    [cryptoHDKey],
+    "keystone"
+  );
+  return multiAccounts;
+}
+
 const buttons = [
   { title: "CryptoOutput", registryItem: createCryptoOutput() },
   { title: "CryptoHdKey", registryItem: createCryptoHdKey() },
   { title: "CryptoAccount", registryItem: createCryptoAccount() },
+  // not supported by the keystone decoder
+  // { title: "CryptoMultiAccount", registryItem: createCryptoMultiAccount() },
 ];
 type Props = RootStackScreenProps<"GenerateQR">;
 
@@ -171,6 +173,8 @@ const GenerateQRScreen: FC<Props> = () => {
           <ScrollView style={styles.scroll}>
             <FlatList
               data={buttons}
+              horizontal={false}
+              numColumns={2}
               contentContainerStyle={styles.buttonContainer}
               renderItem={(button) => (
                 <Pressable
@@ -278,8 +282,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   buttonContainer: {
-    // flexDirection: "row",
-    // flexWrap: "wrap",
+    flexGrow: 1,
     justifyContent: "center",
     paddingHorizontal: 16,
   },
@@ -291,7 +294,6 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "orange",
     borderRadius: 8,
-    minWidth: 300,
   },
 });
 
