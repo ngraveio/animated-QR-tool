@@ -45,7 +45,7 @@ export interface IGenerateAnimatedQrConfig {
   ) => UREncoder;
 }
 
-const defaultEncoderFactory: IGenerateAnimatedQrConfig["encoderFactory"] = (
+export const defaultEncoderFactory: IGenerateAnimatedQrConfig["encoderFactory"] = (
   payload,
   { fragmentSize }
 ) => {
