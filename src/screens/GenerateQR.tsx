@@ -17,11 +17,13 @@ import { SCREEN_HEIGHT } from "../constants";
 import QRCodeGenerator from "@components/QRCodeGenerator";
 import Counter from "@components/Counter";
 import { UREncoder } from "@ngraveio/bc-ur";
-import {
-  RegistryItem,
-} from "@keystonehq/bc-ur-registry";
+import { RegistryItem } from "@keystonehq/bc-ur-registry";
 import { FlatList } from "react-native-gesture-handler";
-import { createCryptoOutput, createCryptoHdKey, createCryptoAccount } from "../keystone";
+import {
+  createCryptoOutput,
+  createCryptoHdKey,
+  createCryptoAccount,
+} from "../keystone";
 import { defaultEncoderFactory } from "@hooks/bcur.hook";
 
 type Props = RootStackScreenProps<"GenerateQR">;
@@ -35,9 +37,13 @@ const GenerateQRScreen: FC<Props> = () => {
   const [fragmentSize, setFragmentSize] = useState(90);
 
   const [encoderFactory, setEncoderFactory] = useReducer(
-    (_, newState: RegistryItem) =>
-      newState.toUREncoder() as unknown as UREncoder,
-      defaultEncoderFactory(payload || "empty", {fragmentSize})
+    (_, newState: RegistryItem | string) => {
+      if (typeof newState === "string") {
+        return defaultEncoderFactory(newState || "empty", { fragmentSize });
+      }
+      return newState.toUREncoder() as unknown as UREncoder;
+    },
+    defaultEncoderFactory(payload || "empty", { fragmentSize })
   );
 
   const startDemo = (data: RegistryItem) => {
@@ -147,6 +153,7 @@ const GenerateQRScreen: FC<Props> = () => {
               title="Enter"
               onPress={() => {
                 setPayload(refs.pendingPayload);
+                setEncoderFactory(refs.pendingPayload);
                 setPayloadModalVisible(false);
               }}
             />
