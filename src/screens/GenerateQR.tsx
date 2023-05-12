@@ -10,13 +10,14 @@ import {
   Text,
   Platform,
   Pressable,
+  useWindowDimensions,
 } from "react-native";
 import { RootStackScreenProps } from "@navigators/types";
 import KeyboardAvoidingView from "@components/KeyboardAvoidingView";
 import { SCREEN_HEIGHT } from "../constants";
 import QRCodeGenerator from "@components/QRCodeGenerator";
 import Counter from "@components/Counter";
-import { UREncoder } from "@ngraveio/bc-ur";
+import { UR, UREncoder } from "@ngraveio/bc-ur";
 import { RegistryItem } from "@keystonehq/bc-ur-registry";
 import { FlatList } from "react-native-gesture-handler";
 import {
@@ -24,46 +25,57 @@ import {
   createCryptoHdKey,
   createCryptoAccount,
 } from "../keystone";
-import { defaultEncoderFactory } from "@hooks/bcur.hook";
+
+export const defaultEncoderFactory: (
+  payload: string,
+  config: {fragmentSize: number}
+) => UREncoder = (
+  payload,
+  { fragmentSize }
+) => {
+  const ur = UR.fromBuffer(Buffer.from(payload));
+  return new UREncoder(ur, fragmentSize);
+};
 
 type Props = RootStackScreenProps<"GenerateQR">;
 
 const GenerateQRScreen: FC<Props> = () => {
   const [payloadModalVisible, setPayloadModalVisible] = useState(false);
   const [isActive, setIsActive] = useState(false);
-  const [payload, setPayload] = useState<string | null>(null);
   const refs = useRef({ pendingPayload: "" }).current;
   const [fps, setFps] = useState(8);
   const [fragmentSize, setFragmentSize] = useState(90);
 
-  const [encoderFactory, setEncoderFactory] = useReducer(
+  const [encoder, setEncoder] = useReducer(
     (_, newState: RegistryItem | string) => {
       if (typeof newState === "string") {
         return defaultEncoderFactory(newState || "empty", { fragmentSize });
       }
       return newState.toUREncoder() as unknown as UREncoder;
     },
-    defaultEncoderFactory(payload || "empty", { fragmentSize })
+    defaultEncoderFactory("empty", { fragmentSize })
   );
 
   const startDemo = (data: RegistryItem) => {
-    setEncoderFactory(data);
-    setPayload(JSON.stringify(data));
+    setEncoder(data);
     setIsActive(true);
   };
 
   const reset = () => {
-    setPayload(null);
     setIsActive(false);
+    setEncoder("reset")
   };
 
-  const getQRSize = () => {
+  const { width} = useWindowDimensions()
+
+  const getQRSize = (width) => {
     if (Platform.OS === "web") {
-      return (SCREEN_HEIGHT - 80) * 0.8;
+      return (width - 80) * 0.8;
     } else {
-      return SCREEN_HEIGHT - 40;
+      return width - 40;
     }
   };
+
 
   const buttons = [
     { title: "CryptoOutput", registryItem: createCryptoOutput() },
@@ -94,14 +106,13 @@ const GenerateQRScreen: FC<Props> = () => {
             ></FlatList>
             <View style={styles.qrContainer}>
               <QRCodeGenerator
-                payload={payload}
                 isActive={isActive}
+                encoder={encoder}
                 config={{
                   fps,
                   fragmentSize,
-                  encoderFactory: () => encoderFactory,
                 }}
-                size={getQRSize()}
+                size={getQRSize(width)}
               />
             </View>
             <View style={{ gap: 10 }}>
@@ -152,8 +163,7 @@ const GenerateQRScreen: FC<Props> = () => {
             <Button
               title="Enter"
               onPress={() => {
-                setPayload(refs.pendingPayload);
-                setEncoderFactory(refs.pendingPayload);
+                setEncoder(refs.pendingPayload);
                 setPayloadModalVisible(false);
               }}
             />
