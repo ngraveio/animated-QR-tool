@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useReducer, useRef, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -8,53 +8,123 @@ import {
   TextInput,
   SafeAreaView,
   Text,
+  Platform,
+  Pressable,
+  useWindowDimensions,
 } from "react-native";
 import { RootStackScreenProps } from "@navigators/types";
 import KeyboardAvoidingView from "@components/KeyboardAvoidingView";
-import { SCREEN_WIDTH } from "../constants";
+import { SCREEN_HEIGHT } from "../constants";
 import QRCodeGenerator from "@components/QRCodeGenerator";
 import Counter from "@components/Counter";
+import { UR, UREncoder } from "@ngraveio/bc-ur";
+import { RegistryItem } from "@keystonehq/bc-ur-registry";
+import { FlatList } from "react-native-gesture-handler";
+import {
+  createCryptoOutput,
+  createCryptoHdKey,
+  createCryptoAccount,
+} from "../keystone";
+
+export const defaultEncoderFactory: (
+  payload: string,
+  config: {fragmentSize: number}
+) => UREncoder = (
+  payload,
+  { fragmentSize }
+) => {
+  const ur = UR.fromBuffer(Buffer.from(payload));
+  return new UREncoder(ur, fragmentSize);
+};
 
 type Props = RootStackScreenProps<"GenerateQR">;
 
 const GenerateQRScreen: FC<Props> = () => {
   const [payloadModalVisible, setPayloadModalVisible] = useState(false);
-  const [isActive, setIsActive] = useState(true);
-  const [payload, setPayload] = useState<string | null>(null);
+  const [isActive, setIsActive] = useState(false);
   const refs = useRef({ pendingPayload: "" }).current;
   const [fps, setFps] = useState(8);
   const [fragmentSize, setFragmentSize] = useState(90);
-  const [isStarted, setIsStarted] = useState(false);
 
-  useEffect(() => {
-    setPayload(isStarted ? refs.pendingPayload : null);
-  }, [isStarted]);
+  const [encoder, setEncoder] = useReducer(
+    (_, newState: RegistryItem | string) => {
+      if (typeof newState === "string") {
+        return defaultEncoderFactory(newState || "empty", { fragmentSize });
+      }
+      return newState.toUREncoder() as unknown as UREncoder;
+    },
+    defaultEncoderFactory("empty", { fragmentSize })
+  );
+
+  const startDemo = (data: RegistryItem) => {
+    setEncoder(data);
+    setIsActive(true);
+  };
+
+  const reset = () => {
+    setIsActive(false);
+    setEncoder("reset")
+  };
+
+  const { width} = useWindowDimensions()
+
+  const getQRSize = (width) => {
+    if (Platform.OS === "web") {
+      return (width - 80) * 0.8;
+    } else {
+      return width - 40;
+    }
+  };
+
+
+  const buttons = [
+    { title: "CryptoOutput", registryItem: createCryptoOutput() },
+    { title: "CryptoHdKey", registryItem: createCryptoHdKey() },
+    { title: "CryptoAccount", registryItem: createCryptoAccount() },
+    // not supported by the keystone decoder
+    // { title: "CryptoMultiAccount", registryItem: createCryptoMultiAccount() },
+  ];
 
   return (
     <>
       <View style={styles.container}>
         <KeyboardAvoidingView keyboardVerticalOffset={100}>
           <ScrollView style={styles.scroll}>
+            <FlatList
+              data={buttons}
+              horizontal={false}
+              numColumns={2}
+              contentContainerStyle={styles.buttonContainer}
+              renderItem={(button) => (
+                <Pressable
+                  onPress={() => startDemo(button.item.registryItem)}
+                  style={styles.button}
+                >
+                  <Text>{button.item.title}</Text>
+                </Pressable>
+              )}
+            ></FlatList>
             <View style={styles.qrContainer}>
               <QRCodeGenerator
-                payload={payload}
-                isActive={isActive && isStarted}
-                config={{ fps, fragmentSize }}
-                size={SCREEN_WIDTH - 40}
+                isActive={isActive}
+                encoder={encoder}
+                config={{
+                  fps,
+                  fragmentSize,
+                }}
+                size={getQRSize(width)}
               />
             </View>
             <View style={{ gap: 10 }}>
-              <Button title={"Reset"} onPress={() => setIsStarted(false)} />
+              <Button title={"Reset"} onPress={reset}></Button>
               <Button
                 title="Enter Payload"
                 onPress={() => setPayloadModalVisible(true)}
               />
               <Button
-                title={isStarted ? (isActive ? "Pause" : "Resume") : "Start"}
+                title={isActive ? "Stop" : "Start"}
                 onPress={() => {
-                  isStarted
-                    ? setIsActive((prev) => !prev)
-                    : setIsStarted(!!refs.pendingPayload);
+                  setIsActive((prev) => !prev);
                 }}
               />
               <View>
@@ -93,7 +163,7 @@ const GenerateQRScreen: FC<Props> = () => {
             <Button
               title="Enter"
               onPress={() => {
-                setPayload(refs.pendingPayload);
+                setEncoder(refs.pendingPayload);
                 setPayloadModalVisible(false);
               }}
             />
@@ -125,6 +195,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingTop: 40,
     paddingBottom: 40,
+  },
+  buttonContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    paddingHorizontal: 16,
+  },
+  button: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    margin: 8,
+    padding: 16,
+    backgroundColor: "orange",
+    borderRadius: 8,
   },
 });
 

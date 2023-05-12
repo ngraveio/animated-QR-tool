@@ -16,7 +16,9 @@ import pako from "pako";
 type Props = RootStackScreenProps<"ScanQR">;
 
 const ScanQRScreen: FC<Props> = () => {
-  const [data, setData] = useState<string>("");
+  const [data, setData] = useState<{ tag: number; type: string; data: any }>(
+    undefined
+  );
   const [showProgress, setShowProgress] = useState(false);
   const refs = useRef<{ timeout: NodeJS.Timeout }>({ timeout: null }).current;
   const [option, setOption] = useState<number>(0);
@@ -27,7 +29,7 @@ const ScanQRScreen: FC<Props> = () => {
       setIsCompleted(true);
     },
     onFail: (error) => {
-      setData("ERROR: " + error);
+      setData({ tag: 666, type: "error", data: "ERROR: " + error });
     },
     onScan: () => {
       clearTimeout(refs.timeout);
@@ -37,21 +39,19 @@ const ScanQRScreen: FC<Props> = () => {
   });
 
   useEffect(() => {
-    if (!isCompleted) return setData("");
+    if (!isCompleted) return setData(undefined);
     try {
-      let result = urDecoder.current.resultUR().decodeCBOR().toString() as any;
-      try {
-        while (typeof result === "string") result = JSON.parse(result);
-      } catch {}
-      switch (option) {
-        case 1: {
-          const buffer = Buffer.from(result.data || "KABUK", "base64");
-          result = pako.ungzip(buffer, { to: "string" }) as string;
-          result = JSON.parse(result);
-          return setData(JSON.stringify(result, null, 2));
-        }
-      }
-      return setData(JSON.stringify(result, null, 2));
+      const registryItem = urDecoder.current.resultRegistryType();
+      console.log("registryItem", registryItem);
+      console.log("tag", registryItem.getRegistryType().getTag());
+      console.log("type", registryItem.getRegistryType().getType());
+      console.log("dataItem", registryItem.toDataItem());
+      console.log("data", registryItem.toDataItem().getData());
+      return setData({
+        tag: registryItem.getRegistryType().getTag(),
+        type: registryItem.getRegistryType().getType(),
+        data: JSON.stringify(registryItem.toDataItem(), null, 2),
+      });
     } catch (error) {
       alert(error);
     }
@@ -100,9 +100,17 @@ const ScanQRScreen: FC<Props> = () => {
             />
           </View>
           <ScrollView bounces={false}>
-            <Text selectable style={styles.input}>
-              {data}
-            </Text>
+            {data ? (
+              <>
+                <Text style={styles.input}>Type: {data.type}</Text>
+                <Text style={styles.input}>Tag: {data.tag}</Text>
+                <Text selectable style={styles.data}>
+                  {data.data}
+                </Text>
+              </>
+            ) : (
+              <></>
+            )}
           </ScrollView>
         </View>
       </Modal>
@@ -111,9 +119,18 @@ const ScanQRScreen: FC<Props> = () => {
 };
 
 const styles = StyleSheet.create({
-  input: {
+  data: {
     color: "black",
     margin: 20,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 10,
+    padding: 10,
+    flex: 1,
+  },
+  input: {
+    color: "black",
+    fontWeight: "bold",
+    margin: 5,
     backgroundColor: "#f0f0f0",
     borderRadius: 10,
     padding: 10,
