@@ -33,7 +33,7 @@ export const defaultEncoderFactory: (
   payload,
   { fragmentSize }
 ) => {
-  const ur = UR.fromBuffer(Buffer.from(payload));
+  const ur = UR.fromBuffer(Buffer.from(payload,"hex"));
   return new UREncoder(ur, fragmentSize);
 };
 
@@ -49,11 +49,11 @@ const GenerateQRScreen: FC<Props> = () => {
   const [encoder, setEncoder] = useReducer(
     (_, newState: RegistryItem | string) => {
       if (typeof newState === "string") {
-        return defaultEncoderFactory(newState || "empty", { fragmentSize });
+        return defaultEncoderFactory(newState || "newstate", { fragmentSize });
       }
       return newState.toUREncoder() as unknown as UREncoder;
     },
-    defaultEncoderFactory("empty", { fragmentSize })
+    null
   );
 
   const startDemo = (data: RegistryItem) => {
