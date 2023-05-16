@@ -46,6 +46,7 @@ const ScanQRScreen: FC<Props> = () => {
       console.log("tag", registryItem.getRegistryType().getTag());
       console.log("type", registryItem.getRegistryType().getType());
       console.log("dataItem", registryItem.toDataItem());
+      console.log("cbor", registryItem.toCBOR());
       console.log("data", registryItem.toDataItem().getData());
       return setData({
         tag: registryItem.getRegistryType().getTag(),
