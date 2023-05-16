@@ -71,6 +71,10 @@ const ScanQRScreen: FC<Props> = () => {
     return () => subscription.remove();
   }, []);
 
+  const onCloseModal = () => {
+    reset();
+  };
+
   return (
     <View style={styles.container}>
       {!isCompleted && (
@@ -88,6 +92,7 @@ const ScanQRScreen: FC<Props> = () => {
       >
         <View style={{ flex: 1, backgroundColor: "white" }}>
           <View>
+            <Button color="red" onPress={onCloseModal} title="close" />
             <Button
               color={option === 0 && "green"}
               title="decoded cbor"
