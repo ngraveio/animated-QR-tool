@@ -25,6 +25,7 @@ import {
   createCryptoHdKey,
   createCryptoAccount,
 } from "../keystone";
+import { createCryptoCoinIdentity } from "../ngrave";
 
 export const defaultEncoderFactory: (
   payload: string,
@@ -81,6 +82,7 @@ const GenerateQRScreen: FC<Props> = () => {
     { title: "CryptoOutput", registryItem: createCryptoOutput() },
     { title: "CryptoHdKey", registryItem: createCryptoHdKey() },
     { title: "CryptoAccount", registryItem: createCryptoAccount() },
+    { title: "CryptoIdentity", RegistryItem: createCryptoCoinIdentity()}
     // not supported by the keystone decoder
     // { title: "CryptoMultiAccount", registryItem: createCryptoMultiAccount() },
   ];
@@ -97,7 +99,7 @@ const GenerateQRScreen: FC<Props> = () => {
               contentContainerStyle={styles.buttonContainer}
               renderItem={(button) => (
                 <Pressable
-                  onPress={() => startDemo(button.item.registryItem)}
+                  onPress={() => startDemo(button.item.registryItem ?? button.item.RegistryItem)}
                   style={styles.button}
                 >
                   <Text>{button.item.title}</Text>
