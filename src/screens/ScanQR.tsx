@@ -46,6 +46,7 @@ const ScanQRScreen: FC<Props> = () => {
       console.log("tag", registryItem.getRegistryType().getTag());
       console.log("type", registryItem.getRegistryType().getType());
       console.log("dataItem", registryItem.toDataItem());
+      console.log("cbor", registryItem.toCBOR());
       console.log("data", registryItem.toDataItem().getData());
       return setData({
         tag: registryItem.getRegistryType().getTag(),
@@ -71,6 +72,10 @@ const ScanQRScreen: FC<Props> = () => {
     return () => subscription.remove();
   }, []);
 
+  const onCloseModal = () => {
+    reset();
+  };
+
   return (
     <View style={styles.container}>
       {!isCompleted && (
@@ -88,6 +93,7 @@ const ScanQRScreen: FC<Props> = () => {
       >
         <View style={{ flex: 1, backgroundColor: "white" }}>
           <View>
+            <Button color="red" onPress={onCloseModal} title="close" />
             <Button
               color={option === 0 && "green"}
               title="decoded cbor"
