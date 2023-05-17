@@ -1698,15 +1698,6 @@
     base58check "^2.0.0"
     tslib "^2.3.0"
 
-"@keystonehq/bc-ur-registry@^0.5.5":
-  version "0.5.5"
-  resolved "https://registry.yarnpkg.com/@keystonehq/bc-ur-registry/-/bc-ur-registry-0.5.5.tgz#b7cd9b08846c627e988933049aac94d3412fbb16"
-  integrity sha512-PoclPHf0OhpIKLfLwzymsu+CjkWf5ZKvaVjpkq3HUalcI4KW8wLk0m8qI2kBVv6F0BQ0ERPqW8OfjLTVqIgWLA==
-  dependencies:
-    "@ngraveio/bc-ur" "^1.1.5"
-    bs58check "^2.1.2"
-    tslib "^2.3.0"
-
 "@keystonehq/ur-decoder@^0.11.0":
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/@keystonehq/ur-decoder/-/ur-decoder-0.11.0.tgz#036c1aa9fa7b5ce13e96d2f44d6796837ba36694"
@@ -1727,9 +1718,27 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
-"@ngrave/bc-ur-registry-crypto-coin-identity@file:ngrave-bc-ur-registry-crypto-coin-identity-0.1.0.tgz":
-  version "0.1.0"
-  resolved "file:ngrave-bc-ur-registry-crypto-coin-identity-0.1.0.tgz#2344a86e0192de4472c1f17c6f2c5ee08332b219"
+"@ngraveio/bc-ur-multi-layer-sync@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@ngraveio/bc-ur-multi-layer-sync/-/bc-ur-multi-layer-sync-0.2.1.tgz#712958f46daee76427ec710568373292f58d21ba"
+  integrity sha512-nBTZPvM45IOFYpnBqQQGG7cbqkJRyvoj4fnQKp1eeBTP/ZyYuy/WXqfIYid/ry0DOgbob7bv0YBsRzZnBMPVaw==
+  dependencies:
+    "@keystonehq/bc-ur-registry" "0.5.4"
+    "@ngraveio/bc-ur-registry-crypto-coin-identity" "0.2.1"
+    "@ngraveio/bc-ur-registry-hex-string" "0.2.1"
+
+"@ngraveio/bc-ur-registry-crypto-coin-identity@0.2.1", "@ngraveio/bc-ur-registry-crypto-coin-identity@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@ngraveio/bc-ur-registry-crypto-coin-identity/-/bc-ur-registry-crypto-coin-identity-0.2.1.tgz#728b9e5ff5108960ccaa71dd8972f7a25f6c8cc9"
+  integrity sha512-TSVRWvt42/KjzrytCDRibAtYOma19z52tU0JDr9M204lxuhhjMoVk/t6YS6blQcJAFTMvHuYOfUwSwzDUQsFVg==
+  dependencies:
+    "@keystonehq/bc-ur-registry" "0.5.4"
+    uuid "^9.0.0"
+
+"@ngraveio/bc-ur-registry-hex-string@0.2.1", "@ngraveio/bc-ur-registry-hex-string@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@ngraveio/bc-ur-registry-hex-string/-/bc-ur-registry-hex-string-0.2.1.tgz#8f0ffc7f5b2c7c2fe534cfb7ec43d371f5980e7f"
+  integrity sha512-5C/WPTHIOWs3XEq9lxka0/aq0xmZERL76FKidtCo8QMOHk9cYTlm9vl1w9qdrnSrX8Mggxrs360iEONKPUQfZQ==
   dependencies:
     "@keystonehq/bc-ur-registry" "0.5.4"
     uuid "^9.0.0"

@@ -94,7 +94,7 @@ const ScanQRScreen: FC<Props> = () => {
         <View style={{ flex: 1, backgroundColor: "white" }}>
           <View>
             <Button color="red" onPress={onCloseModal} title="close" />
-            <Button
+            {/* <Button
               color={option === 0 && "green"}
               title="decoded cbor"
               onPress={() => setOption(0)}
@@ -103,7 +103,7 @@ const ScanQRScreen: FC<Props> = () => {
               color={option === 1 && "green"}
               title="decoded cbor & unzipped"
               onPress={() => setOption(1)}
-            />
+            /> */}
           </View>
           <ScrollView bounces={false}>
             {data ? (
