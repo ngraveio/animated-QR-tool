@@ -1,45 +1,21 @@
 image: node:latest
 
-stages:
-  - build
-  - deploy
-
 cache:
   paths:
-    - node_modules/
-
-install_dependencies:
-  stage: build
-  script:
-    - yarn install
-  artifacts:
-    paths:
-      - node_modules/
-  only:
-    - main
-
-expo_export:
-  stage: build
-  script:
-    - yarn add --dev @expo/webpack-config
-    - npx expo export:web
-
-  artifacts:
-    paths:
-      - web-build/
-
-  only:
-    - main
+    - node_modules
+  key:
+    files:
+      - yarn.lock
 
 pages:
   stage: deploy
-  dependencies:
-    - expo_export
   script:
-    - mv web-build public
+    - yarn install --frozen-lockfile
+    - yarn add --dev @expo/webpack-config
+    - npx expo export:web && mv web-build public
   artifacts:
     paths:
       - public/
-    expire_in: 1 day
+    expire_in: '1 second'
   only:
     - main
