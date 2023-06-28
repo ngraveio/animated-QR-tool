@@ -29,12 +29,7 @@ jobs:
 
       - name: Build the pages
         run : |
-          yarn add --dev @expo/webpack-config
           npx expo export:web
-
-      - name: Rename web-build folder
-        shell: sh
-        run: |
           mv web-build _site/
 
       - name: Upload artifact
