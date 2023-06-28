@@ -32,24 +32,14 @@ jobs:
           yarn add --dev @expo/webpack-config
           npx expo export:web
 
-      - name: Archive artifact
+      - name: Rename web-build folder
         shell: sh
         run: |
-          tar \
-            --dereference --hard-dereference \
-            --directory "web-build" \
-            -cvf "$RUNNER_TEMP/web-build.tar" \
-            --exclude=.git \
-            --exclude=.github \
-            .
+          mv web-build _site/
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: 'github-pages'
-          path: ${{ runner.temp }}/web-build.tar
-          retention-days: 1
-          if-no-files-found: error
+        uses: actions/upload-pages-artifact@v1
+  
   deploy:
     environment:
       name: github-pages
