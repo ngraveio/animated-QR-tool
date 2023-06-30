@@ -153,7 +153,7 @@ export function createCryptoPortfolioCoin(): RegistryItem {
   const detailedAccount2 = new CryptoDetailedAccount(cryptoHDKey2, tokenIds2);
 
   // Create a CryptoPortfolioCoin
-  const cryptoPortfolioCoin = new CryptoPortfolioCoin(coinIdentity,[]);
+  const cryptoPortfolioCoin = new CryptoPortfolioCoin(coinIdentity, []);
   // const cryptoPortfolioCoin = new CryptoPortfolioCoin(coinIdentity, [
   //   detailedAccount,
   //   detailedAccount2,
