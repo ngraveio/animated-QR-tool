@@ -1,7 +1,7 @@
 import { UR, URDecoder, UREncoder } from "@ngraveio/bc-ur";
 import { useCallback, useEffect, useRef, useState } from "react";
 // import { URRegistryDecoder } from '@keystonehq/ur-decoder';
-import { URRegistryDecoder } from '../ngrave';
+import { URRegistryDecoder } from "../ngrave";
 
 export const useScanAnimatedQr = ({
   onSuccess,
