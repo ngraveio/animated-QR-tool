@@ -11,6 +11,9 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "crypto-js": "4.2.0",
+    "@ngrave/baseprotocol": "2.4.0",
+    "@ngrave/avax": "2.2.1",    
     "@expo/webpack-config": "^18.0.1",
     "@keystonehq/bc-ur-registry": "0.5.4",
     "@keystonehq/ur-decoder": "^0.11.0",
