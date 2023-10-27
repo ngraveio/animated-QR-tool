@@ -1,7 +1,7 @@
 {
   "name": "@ngrave/qr",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
+  "main": "index.js",
   "homepage": "/animated-QR-tool",
   "scripts": {
     "start": "expo start",
