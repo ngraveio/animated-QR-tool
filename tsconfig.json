@@ -8,5 +8,61 @@
       "@hooks/*": ["./src/hooks/*"],
       "@navigators/*": ["./src/navigators/*"]
     }
-  }
+  },
+  "references": [
+    {
+      "path": "../../coins/avax"
+    },
+    {
+      "path": "../../common/baseprotocol"
+    },
+    {
+      "path": "../../coins/binancecoin"
+    },
+    {
+      "path": "../../coins/bitcoin"
+    },
+    {
+      "path": "../../coins/bitcoincash"
+    },
+    {
+      "path": "../../coins/dash"
+    },
+    {
+      "path": "../../coins/dogecoin"
+    },
+    {
+      "path": "../../coins/elrondcoin"
+    },
+    {
+      "path": "../../services/ens-resolver"
+    },
+    {
+      "path": "../../coins/ethereum"
+    },
+    {
+      "path": "../../coins/groestlcoin"
+    },
+    {
+      "path": "../../coins/litecoin"
+    },
+    {
+      "path": "../../coins/polygon"
+    },
+    {
+      "path": "../../coins/ripplecoin"
+    },
+    {
+      "path": "../../coins/solana"
+    },
+    {
+      "path": "../../coins/stellarcoin"
+    },
+    {
+      "path": "../../coins/tezos"
+    },
+    {
+      "path": "../../coins/zcashcoin"
+    }
+  ]
 }
