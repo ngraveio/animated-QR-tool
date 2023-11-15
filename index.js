@@ -1,4 +1,6 @@
 /** To make coin packages work */
+import 'node-libs-react-native/globals';
+
 // Import the crypto getRandomValues shim (**BEFORE** the shims)
 import "react-native-get-random-values"
 
