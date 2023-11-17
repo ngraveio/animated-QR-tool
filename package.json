@@ -49,6 +49,7 @@
     "expo-camera": "~13.4.4",
     "expo-status-bar": "~1.6.0",
     "expo-updates": "~0.18.17",
+    "memfs": "^4.6.0",
     "node-libs-react-native": "^1.2.1",
     "pako": "^2.1.0",
     "patch-package": "^7.0.0",
