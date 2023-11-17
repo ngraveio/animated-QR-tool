@@ -1,6 +1,6 @@
 module.exports = function (api) {
   api.cache(true);
-  return {
+  const result = {
     presets: ["babel-preset-expo"],
     plugins: [
       [
@@ -12,9 +12,13 @@ module.exports = function (api) {
             "@screens": "./src/screens",
             "@hooks": "./src/hooks",
             "@navigators": "./src/navigators",
+            "https": require.resolve('https-browserify'),
+            "zlib": require.resolve('browserify-zlib'),
           },
         },
       ],
-    ],
+    ], 
   };
+  console.log('Babel config', JSON.stringify(result, null, 2));
+  return result;
 };
