@@ -8,7 +8,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "preinstall": "node scripts/check-npm-token.js"
   },
   "dependencies": {
     "@craftzdog/react-native-buffer": "^6.0.5",
